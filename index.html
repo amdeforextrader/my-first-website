@@ -1,43 +1,220 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My First Website</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      text-align: center;
-      padding-top: 60px;
-    }
-    h1 {
-      color: #333;
-    }
-    p {
-      color: #555;
-      font-size: 18px;
-    }
-    button {
-      padding: 12px 20px;
-      font-size: 16px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danmogaji Game Hub</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+            color: #fff;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        nav {
+            margin: 20px 0;
+        }
+        nav a {
+            color: #00ffcc;
+            margin: 0 15px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #00cc99;
+        }
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .game-card {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            transition: transform 0.3s;
+        }
+        .game-card:hover {
+            transform: scale(1.05);
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
+    <header>
+        <h1>Danmogaji Game Hub</h1>
+        <nav>
+            <a href="#snake">Snake Game</a>
+            <a href="#tictactoe">Tic Tac Toe</a>
+            <a href="#clickspeed">Click Speed Test</a>
+            <a href="#guessthenumber">Guess the Number</a>
+        </nav>
+    </header>
+    <div class="game-container">
+        <div class="game-card" id="snake">
+            <h2>Snake Game</h2>
+            <canvas id="snakeCanvas" width="200" height="200"></canvas>
+            <button onclick="startSnakeGame()">Start Game</button>
+        </div>
+        <div class="game-card" id="tictactoe">
+            <h2>Tic Tac Toe</h2>
+            <div id="ticTacToeBoard"></div>
+            <button onclick="startTicTacToe()">Start Game</button>
+        </div>
+        <div class="game-card" id="clickspeed">
+            <h2>Click Speed Test</h2>
+            <button onclick="startClickSpeedTest()">Click Me!</button>
+            <div id="clickSpeedResult"></div>
+        </div>
+        <div class="game-card" id="guessthenumber">
+            <h2>Guess the Number</h2>
+            <input type="number" id="guessInput" placeholder="Enter a number">
+            <button onclick="guessNumber()">Guess</button>
+            <div id="guessResult"></div>
+        </div>
+    </div>
+    <footer>
+        <p>© Danmogaji 2026</p>
+    </footer>
+    <script>
+        // Snake Game
+        function startSnakeGame() {
+            const canvas = document.getElementById('snakeCanvas');
+            const ctx = canvas.getContext('2d');
+            let snake = [{x: 10, y: 10}];
+            let direction = {x: 0, y: 0};
+            let food = {x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20)};
+            let score = 0;
 
-  <h1>Welcome to my website</h1>
-  <p>I built this myself.</p>
-  <button onclick="showMessage()">Click me</button>
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'green';
+                snake.forEach(part => ctx.fillRect(part.x * 10, part.y * 10, 10, 10));
+                ctx.fillStyle = 'red';
+                ctx.fillRect(food.x * 10, food.y * 10, 10, 10);
+            }
 
-  <script>
-    function showMessage() {
-      alert("Hey! You clicked the button. 🎉");
-    }
-  </script>
+            function update() {
+                const head = {x: snake[0].x + direction.x, y: snake[0].y + direction.y};
+                snake.unshift(head);
+                if (head.x === food.x && head.y === food.y) {
+                    score++;
+                    food = {x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20)};
+                } else {
+                    snake.pop();
+                }
+                draw();
+            }
 
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'ArrowUp') direction = {x: 0, y: -1};
+                if (event.key === 'ArrowDown') direction = {x: 0, y: 1};
+                if (event.key === 'ArrowLeft') direction = {x: -1, y: 0};
+                if (event.key === 'ArrowRight') direction = {x: 1, y: 0};
+            });
+
+            setInterval(update, 100);
+        }
+
+        // Tic Tac Toe
+        function startTicTacToe() {
+            const board = document.getElementById('ticTacToeBoard');
+            board.innerHTML = '';
+            let currentPlayer = 'X';
+            let boardState = ['', '', '', '', '', '', '', '', ''];
+
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.style.width = '60px';
+                cell.style.height = '60px';
+                cell.style.border = '1px solid #00ffcc';
+                cell.style.display = 'inline-block';
+                cell.style.lineHeight = '60px';
+                cell.style.textAlign = 'center';
+                cell.style.fontSize = '24px';
+                cell.style.cursor = 'pointer';
+                cell.addEventListener('click', () => makeMove(i));
+                board.appendChild(cell);
+            }
+
+            function makeMove(index) {
+                if (boardState[index] === '') {
+                    boardState[index] = currentPlayer;
+                    board.children[index].innerText = currentPlayer;
+                    if (checkWin()) {
+                        alert(currentPlayer + ' wins!');
+                        resetGame();
+                    } else {
+                        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                    }
+                }
+            }
+
+            function checkWin() {
+                const winPatterns = [
+                    [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                    [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                    [0, 4, 8], [2, 4, 6]
+                ];
+                return winPatterns.some(pattern => {
+                    return pattern.every(index => boardState[index] === currentPlayer);
+                });
+            }
+
+            function resetGame() {
+                boardState = ['', '', '', '', '', '', '', '', ''];
+                Array.from(board.children).forEach(cell => cell.innerText = '');
+                currentPlayer = 'X';
+            }
+        }
+
+        // Click Speed Test
+        function startClickSpeedTest() {
+            const result = document.getElementById('clickSpeedResult');
+            let startTime, endTime;
+
+            result.innerHTML = 'Click the button as fast as you can!';
+            document.querySelector('button[onclick="startClickSpeedTest()"]').onclick = () => {
+                if (!startTime) {
+                    startTime = new Date();
+                    result.innerHTML = 'Click!';
+                } else {
+                    endTime = new Date();
+                    const timeTaken = (endTime - startTime) / 1000;
+                    result.innerHTML = `You clicked in ${timeTaken} seconds!`;
+                    startTime = null;
+                }
+            };
+        }
+
+        // Guess the Number
+        function guessNumber() {
+            const guessInput = document.getElementById('guessInput');
+            const guessResult = document.getElementById('guessResult');
+            const randomNumber = Math.floor(Math.random() * 100) + 1;
+
+            if (guessInput.value == randomNumber) {
+                guessResult.innerHTML = 'Correct! The number was ' + randomNumber;
+            } else {
+                guessResult.innerHTML = 'Try again!';
+            }
+        }
+    </script>
 </body>
 </html>
